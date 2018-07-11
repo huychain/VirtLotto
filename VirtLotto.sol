@@ -1,17 +1,3 @@
-// The following user stories must be completed:
-// [x] The contract has one operation pickNumber(uint number) payable.
-// [x] pickNumber should accept integer between 1 and 10 inclusive, and accept any amount of ether (minimum bet is X finney).
-// [x] After Y calls to pickNumber, the contract will choose a random number.
-// [x] X and Y are configurable in the constructor of the contract.
-// [ ] The winner(s) get to keep all the money that has been pooled in the contract. If there is more than one winner, the prize money is split evenly.
-// [x] Addresses are limited on the number of tickets. One address can only purchase a maximum of 4 tickets.
-// [ ] Users should be able to pick numbers via a simple web interface. A sample index.html can be found here.
-
-// The following advanced user stories are optional. You're not required to do these, but you will learn more from doing them:
-// [ ] Make a "true" random number. A common example is to use Oraclize.
-// [ ] Contract picks winner after 5 calls or 5 minutes, whichever happens first. To schedule calls, you might want to look into using the Ethereum Alarm Clock.
-// [ ] Contract offers dynamic odds. Once a number is picked, the payout to the winners decreases and odds on others increase proportionally.
-
 pragma solidity ^0.4.18;
 
 contract VirtLotto {
@@ -32,6 +18,7 @@ contract VirtLotto {
   address public owner;
 
   address[] public players;
+  address[] public winners;
   mapping(address => Ticket[]) public playerTickets;
   uint public totalBetAmount;
   uint8 public betCount;
@@ -70,12 +57,50 @@ contract VirtLotto {
 
     // check end round
     if (betCount >= betsPerRound) {
-      // TODO: get random number
-
-      // deliver prizes
-
-      // reset game
+      // get win number
+      uint8 winNumber = random();
+      // end round
+      endRound(winNumber);
     }
+  }
+
+  function endRound(uint8 winNumber) private {
+    // get winners
+    for (uint i = 0; i < players.length; i++) {
+      if (isWinner(winNumber, players[i])) {
+        winners.push(players[i]);
+      }
+    }
+
+    bool hasWinners = winners.length > 0;
+
+    // deliver prizes if have winners
+    if (hasWinners) {
+      uint prize = totalBetAmount / winners.length;
+      for (i = 0; i < winners.length; i++) {
+        winners[i].transfer(prize);
+      }
+    }
+
+    // reset round
+    if (hasWinners) {
+      totalBetAmount = 0;
+    }
+    for (i = 0; i < players.length; i++) {
+      delete playerTickets[players[i]];
+    }
+    players.length = 0;
+    winners.length = 0;
+    betCount = 0;
+  }
+
+  function isWinner(uint8 winNumber, address player) private view returns (bool) {
+    for (uint i = 0; i < playerTickets[player].length; i++) {
+      if (playerTickets[player][i].number == winNumber) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function random() view public returns (uint8) {
