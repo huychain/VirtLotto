@@ -1,0 +1,37 @@
+<!doctype>
+<html>
+
+<head>
+  <script src="bower_components/web3/dist/web3.min.js"></script>
+  <script type="text/javascript">
+
+    var web3 = new Web3();
+    web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"));
+
+  /*
+    var abi = // your ABI is here;
+    var contract = web3.eth.contract(abi);
+    var contractInstance = contract.at("//address you deployed contract");
+*/
+
+    function callPickNumber() {
+        // call the contract
+        var param = parseInt(document.getElementById('value').value);
+        contractInstance.pickNumber(param, {from: web3.eth.accounts[0], gas: 100000, value: 100});
+
+        document.getElementById('result').innerText = res.toString(10);
+    }
+
+</script>
+</head>
+<body>
+    <h1>Contract</h1>
+    <div id="code"></div> 
+    <div id="status"></div>
+    <div id='call'>
+        <input type="number" id="value"></input>
+        <button type="button" onClick="callPickNumber">Pick Number</button>
+      </div>
+    <div id="result"></div>
+</body>
+</html>
