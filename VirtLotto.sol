@@ -4,7 +4,7 @@
 // [x] After Y calls to pickNumber, the contract will choose a random number.
 // [x] X and Y are configurable in the constructor of the contract.
 // [ ] The winner(s) get to keep all the money that has been pooled in the contract. If there is more than one winner, the prize money is split evenly.
-// [ ] Addresses are limited on the number of tickets. One address can only purchase a maximum of 4 tickets.
+// [x] Addresses are limited on the number of tickets. One address can only purchase a maximum of 4 tickets.
 // [ ] Users should be able to pick numbers via a simple web interface. A sample index.html can be found here.
 
 // The following advanced user stories are optional. You're not required to do these, but you will learn more from doing them:
@@ -15,18 +15,26 @@
 pragma solidity ^0.4.18;
 
 contract VirtLotto {
-  address public owner;
-
-  // configurations
-  uint public minBet = 100 finney;
-  uint8 public maxNumOfBets = 5;
   // constants
   uint8 public constant MIN_NUMBER = 1;
   uint8 public constant MAX_NUMBER = 10;
+  uint8 public constant MAX_TICKETS_PER_PLAYER = 4;
 
-  uint public totalBet;
-  uint8 public numberOfBets;
+  struct Ticket {
+    uint8 number;
+    uint amount;
+  }
+
+  // configurations
+  uint public minBet = 100 finney;
+  uint8 public betsPerRound = 5;
+
+  address public owner;
+
   address[] public players;
+  mapping(address => Ticket[]) public playerTickets;
+  uint public totalBetAmount;
+  uint8 public betCount;
 
   modifier onlyOwner {
     require (
@@ -36,40 +44,37 @@ contract VirtLotto {
     _;
   }
 
-  constructor(uint _minBet, uint8 _maxNumOfBets) public {
-    if (_minBet > 0) {
-      minBet = _minBet;
-    }
-    if (_maxNumOfBets > 0) {
-      maxNumOfBets = _maxNumOfBets;
-    }
+  constructor(uint _minBet, uint8 _betsPerRound) public {
+    minBet = _minBet;
+    betsPerRound = _betsPerRound;
     owner = msg.sender;
   }
 
   function pickNumber(uint8 number) public payable {
-    require(validBet(number) == true, "Bet between 1 and 10");
+    require(number >= MIN_NUMBER && number <= MAX_NUMBER, "Bet between 1 and 10");
     require(msg.value >= minBet, "Below min bet");
+    require(playerTickets[msg.sender].length < MAX_TICKETS_PER_PLAYER, "Excess max bet times per player");
+
+    // first bet of sender? keep track
+    if (playerTickets[msg.sender].length == 0) {
+      players.push(msg.sender);
+    }
+
+    // get to this, the bet is valid, keep it
+    playerTickets[msg.sender].push(Ticket(number, msg.value));
 
     // increase bet count
-    numberOfBets += 1;
-    // keep bet value
-    totalBet += msg.value;
-    // keep player
-    players.push(msg.sender);
+    betCount++;
+    // increase bet amount
+    totalBetAmount += msg.value;
 
-    if (numberOfBets >= maxNumOfBets) {
-      uint8 winNumber = random();
+    // check end round
+    if (betCount >= betsPerRound) {
+      // TODO: get random number
 
-      // then, reset count
-      numberOfBets = 0;
-    }
-  }
+      // deliver prizes
 
-  function validBet(uint8 num) private pure returns (bool) {
-    if (num >= MIN_NUMBER && num <= MAX_NUMBER) {
-      return true;
-    } else {
-      return false;
+      // reset game
     }
   }
 
