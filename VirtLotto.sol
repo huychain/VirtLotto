@@ -15,4 +15,21 @@
 pragma solidity ^0.4.18;
 
 contract VirtLotto {
+  address public owner;
+
+  modifier onlyOwner {
+    require (
+      msg.sender == owner,
+      "Only owner can call this function."
+    );
+    _;
+  }
+
+  constructor() public {
+    owner = msg.sender;
+  }
+
+  function kill() public onlyOwner {
+    selfdestruct(owner);
+  }
 }
