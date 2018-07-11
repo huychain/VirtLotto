@@ -31,6 +31,11 @@ contract VirtLotto {
     _;
   }
 
+  // Events that will be fired on changes.
+  event PickNumber(address player, uint8 number, uint amount);
+  event WinNumber(uint8 winNumber);
+  event DeliverPrize(address winner, uint prize);
+
   constructor(uint _minBet, uint8 _betsPerRound) public {
     minBet = _minBet;
     betsPerRound = _betsPerRound;
@@ -55,10 +60,15 @@ contract VirtLotto {
     // increase bet amount
     totalBetAmount += msg.value;
 
+    emit PickNumber(msg.sender, number, msg.value);
+
     // check end round
     if (betCount >= betsPerRound) {
       // get win number
       uint8 winNumber = random();
+
+      emit WinNumber(winNumber);
+
       // end round
       endRound(winNumber);
     }
@@ -79,6 +89,8 @@ contract VirtLotto {
       uint prize = totalBetAmount / winners.length;
       for (i = 0; i < winners.length; i++) {
         winners[i].transfer(prize);
+
+        emit DeliverPrize(winners[i], prize);
       }
     }
 

@@ -8,7 +8,7 @@ Required user stories:
 - [x] X and Y are configurable in the constructor of the contract.
 - [x] The winner(s) get to keep all the money that has been pooled in the contract. If there is more than one winner, the prize money is split evenly.
 - [x] Addresses are limited on the number of tickets. One address can only purchase a maximum of 4 tickets.
-- [ ] Users should be able to pick numbers via a simple web interface. A sample index.html can be found here.
+- [x] Users should be able to pick numbers via a simple web interface. A sample index.html can be found here.
 
 Advanced user stories (optional):
 

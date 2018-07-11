@@ -2,26 +2,23 @@
 <html>
 
 <head>
-  <script src="bower_components/web3/dist/web3.min.js"></script>
+  <script src="node_modules/web3/dist/web3.min.js"></script>
   <script type="text/javascript">
 
     var web3 = new Web3();
     web3.setProvider(new web3.providers.HttpProvider("http://localhost:7545"));
 
-  /*
-    var abi = // your ABI is here;
+    var abi = JSON.parse('[{"constant":false,"inputs":[],"name":"kill","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"},{"name":"","type":"uint256"}],"name":"playerTickets","outputs":[{"name":"number","type":"uint8"},{"name":"amount","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"MAX_TICKETS_PER_PLAYER","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"betsPerRound","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"random","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalBetAmount","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"number","type":"uint8"}],"name":"pickNumber","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"minBet","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"winners","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"betCount","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"MIN_NUMBER","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"players","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"MAX_NUMBER","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[{"name":"_minBet","type":"uint256"},{"name":"_betsPerRound","type":"uint8"}],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"player","type":"address"},{"indexed":false,"name":"number","type":"uint8"},{"indexed":false,"name":"amount","type":"uint256"}],"name":"PickNumber","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"winNumber","type":"uint8"}],"name":"WinNumber","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"winner","type":"address"},{"indexed":false,"name":"prize","type":"uint256"}],"name":"DeliverPrize","type":"event"}]');
     var contract = web3.eth.contract(abi);
-    var contractInstance = contract.at("//address you deployed contract");
-*/
+    var contractInstance = contract.at("0x8182b3f7c99d7d2d473987d25f0fc2658783dee4");
 
     function callPickNumber() {
         // call the contract
         var param = parseInt(document.getElementById('value').value);
-        contractInstance.pickNumber(param, {from: web3.eth.accounts[0], gas: 100000, value: 100});
+        var res = contractInstance.pickNumber(param, {from: web3.eth.accounts[0], gas: 1000000, value: web3.toWei(100, "finney")});
 
         document.getElementById('result').innerText = res.toString(10);
     }
-
 </script>
 </head>
 <body>
@@ -30,7 +27,7 @@
     <div id="status"></div>
     <div id='call'>
         <input type="number" id="value"></input>
-        <button type="button" onClick="callPickNumber">Pick Number</button>
+        <button type="button" onClick="callPickNumber()">Pick Number</button>
       </div>
     <div id="result"></div>
 </body>
