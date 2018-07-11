@@ -29,6 +29,9 @@ contract VirtLotto {
     owner = msg.sender;
   }
 
+  function pickNumber(uint number) public payable {
+  }
+
   function kill() public onlyOwner {
     selfdestruct(owner);
   }
