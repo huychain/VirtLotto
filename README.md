@@ -44,27 +44,33 @@ open terminal, type `node` to get to REPL, then
 Web3 = require('web3')
 web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545")) // Check for the right port number
 
-code = fs.readFileSync('Voting.sol').toString();
+code = fs.readFileSync('VirtLotto.sol').toString();
 solc = require('solc');
 compiledCode = solc.compile(code);
 
-VotingContract = web3.eth.contract(JSON.parse(compiledCode.contracts[':Voting'].interface))
+VirtLottoContract = web3.eth.contract(JSON.parse(compiledCode.contracts[':VirtLotto'].interface))
 
-byteCode = compiledCode.contracts[':Voting'].bytecode
+byteCode = compiledCode.contracts[':VirtLotto'].bytecode
 ```
 
 #### deploy
 (latest contract version)
 
 ```javascript
-deployedContract = VotingContract.new(
-    ['Bitcoin', 'Litecoin', 'Dogecoin'],
+deployedContract = VirtLottoContract.new(
+    web3.toWei('1', 'finney'), 5,
     {
-        data: byteCode, 
+        data: byteCode,
         from: web3.eth.accounts[0],
-        gas: 1000000
+        gas: 2000000
     })
-contractInstance = VotingContract.at(deployedContract.address)
+contractInstance = VirtLottoContract.at(deployedContract.address)
+```
+
+#### place a bet
+
+```javascript
+contractInstance.pickNumber(1, {from: web3.eth.accounts[0], gas: 1000000, value: web3.toWei(1, "finney")});
 ```
 
 #### notes on config index.js
@@ -75,20 +81,14 @@ replace `<interface>`, `<address>`
 ...
 abi = JSON.parse('<interface>')
 ...
-contractInstance = VotingContract.at('<address>');
+contractInstance = VirtLottoContract.at('<address>');
 ...
 ```
 
 with latest retrieved from command
 
 ```javascript
-compiledCode.contracts[':Voting'].interface
+compiledCode.contracts[':VirtLotto'].interface
 
 contractInstance.address
 ```
-
-------------------------------
-
-### Vote with Your Wallet
-
-![Vote with Your Wallet](./paymoney.gif)
