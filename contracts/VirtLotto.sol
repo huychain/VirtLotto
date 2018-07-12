@@ -2,7 +2,7 @@ pragma solidity ^0.4.18;
 
 import "./oraclizeAPI_0.5.sol";
 
-contract VirtLotto {
+contract VirtLotto is usingOraclize {
   // constants
   uint8 public constant MIN_NUMBER = 1;
   uint8 public constant MAX_NUMBER = 10;
@@ -38,10 +38,14 @@ contract VirtLotto {
   event WinNumber(uint8 winNumber);
   event DeliverPrize(address winner, uint prize);
 
+  event newRandomNumber_bytes(bytes);
+  event newRandomNumber_uint(uint);
+
   constructor(uint _minBet, uint8 _betsPerRound) public {
     minBet = _minBet;
     betsPerRound = _betsPerRound;
     owner = msg.sender;
+    oraclize_setProof(proofType_Ledger); // sets the Ledger authenticity proof in the constructor
   }
 
   function pickNumber(uint8 number) public payable {
@@ -67,12 +71,7 @@ contract VirtLotto {
     // check end round
     if (betCount >= betsPerRound) {
       // get win number
-      uint8 winNumber = random();
-
-      emit WinNumber(winNumber);
-
-      // end round
-      endRound(winNumber);
+      trueRandom();
     }
   }
 
@@ -115,6 +114,43 @@ contract VirtLotto {
       }
     }
     return false;
+  }
+
+  // the callback function is called by Oraclize when the result is ready
+  // the oraclize_randomDS_proofVerify modifier prevents an invalid proof to execute this function code:
+  // the proof validity is fully verified on-chain
+  function __callback(bytes32 _queryId, string _result, bytes _proof)
+  {
+    if (msg.sender != oraclize_cbAddress()) revert();
+
+    if (oraclize_randomDS_proofVerify__returnCode(_queryId, _result, _proof) != 0) {
+      // the proof verification has failed, do we need to take any action here? (depends on the use case)
+    } else {
+      // the proof verification has passed
+      // now that we know that the random number was safely generated, let's use it..
+
+      emit newRandomNumber_bytes(bytes(_result)); // this is the resulting random number (bytes)
+
+      // for simplicity of use, let's also convert the random bytes to uint if we need
+      uint maxRange = 2**(8* 7); // this is the highest uint we want to get. It should never be greater than 2^(8*N), where N is the number of random bytes we had asked the datasource to return
+      uint randomNumber = uint(keccak256(abi.encodePacked(_result))) % maxRange; // this is an efficient way to get the uint out in the [0, maxRange] range
+
+      emit newRandomNumber_uint(randomNumber); // this is the resulting random number (uint)
+
+      uint8 winNumber = uint8(randomNumber % 10);
+
+      emit WinNumber(winNumber);
+
+      // end round
+      endRound(winNumber);
+    }
+  }
+
+  function trueRandom() payable {
+    uint N = 7; // number of random bytes we want the datasource to return
+    uint delay = 0; // number of seconds to wait before the execution takes place
+    uint callbackGas = 200000; // amount of gas we want Oraclize to set for the callback function
+    bytes32 queryId = oraclize_newRandomDSQuery(delay, N, callbackGas); // this function internally generates the correct oraclize_query and returns its queryId
   }
 
   function random() view public returns (uint8) {

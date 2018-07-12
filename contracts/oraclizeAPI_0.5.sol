@@ -356,10 +356,10 @@ contract usingOraclize {
         return false;
     }
 
-    function __callback(bytes32 myid, string result) public pure {
+    function __callback(bytes32 myid, string result) public {
         __callback(myid, result, new bytes(0));
     }
-    function __callback(bytes32 myid, string result, bytes proof) public pure {
+    function __callback(bytes32 myid, string result, bytes proof) public {
       return;
       myid; result; proof; // Silence compiler warnings
     }
