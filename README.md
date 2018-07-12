@@ -12,9 +12,12 @@ Required user stories:
 
 Advanced user stories (optional):
 
-- [ ] Make a "true" random number. A common example is to use Oraclize.
+- [x] Make a "true" random number. A common example is to use Oraclize.
 - [ ] Contract picks winner after 5 calls or 5 minutes, whichever happens first. To schedule calls, you might want to look into using the Ethereum Alarm Clock.
 - [ ] Contract offers dynamic odds. Once a number is picked, the payout to the winners decreases and odds on others increase proportionally.
+
+Notes:
+- Code with Oraclize all set [here](https://github.com/huychain/VirtLotto/tree/true_random). However, can't deploy, seem like it's too heavy and use up large amount of gas.
 
 ------------------------------
 
