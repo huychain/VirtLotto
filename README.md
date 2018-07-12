@@ -23,6 +23,14 @@ Notes:
 
 ## with truffle
 
+#### refer to Oraclize
+
+```
+truffle install oraclize-api
+```
+
+further reading: http://docs.oraclize.it/#home
+
 #### compile
 
 ```
