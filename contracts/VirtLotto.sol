@@ -1,5 +1,7 @@
 pragma solidity ^0.4.18;
 
+import "./oraclizeAPI_0.5.sol";
+
 contract VirtLotto {
   // constants
   uint8 public constant MIN_NUMBER = 1;
