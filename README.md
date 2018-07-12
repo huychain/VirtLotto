@@ -18,6 +18,55 @@ Advanced user stories (optional):
 
 ------------------------------
 
+## with truffle
+
+#### compile
+
+```
+truffle compile
+```
+
+#### deploy in develop env
+
+enter truffle develop env, interactive mode
+
+```
+truffle develop
+```
+
+then
+
+```
+migrate
+```
+or, to migrate again
+
+```
+migrate --reset
+```
+
+view log
+
+```
+truffle develop --log
+```
+
+keep deployed instance
+
+```
+VirtLotto.deployed().then(function(res){contractInstance = VirtLotto.at(res.address)});
+```
+
+place a bet
+
+```
+contractInstance.pickNumber(1, {from: web3.eth.accounts[0], gas: 1000000, value: web3.toWei(1, "finney")});
+```
+
+------------------------------
+
+## with Node cmd
+
 #### start Ganache server
 
 ```
